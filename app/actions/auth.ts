@@ -112,13 +112,13 @@ export async function login(
   }
 }
 
-export async function signOutAction(): Promise<FormActionResult> {
+export async function signOutAction(): Promise<void> {
   try {
     await nextAuthSignOut({ redirectTo: "/auth/login" });
-    return { success: true };
   } catch (error) {
     console.error("Sign out error:", error);
-    return { success: false, error: "Failed to sign out. Please try again." };
+    // In a server component form action, we typically don't return an error object
+    // as the redirect is the primary flow. If redirect fails, the page will remain.
   }
 }
 

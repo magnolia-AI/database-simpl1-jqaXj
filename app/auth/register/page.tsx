@@ -1,3 +1,5 @@
+import React from 'react';
+
 'use client';
 
 import { register } from "@/app/actions/auth";
