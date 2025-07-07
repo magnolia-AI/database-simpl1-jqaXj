@@ -75,7 +75,50 @@ export async function register(
   }
 }
 
-export async function signOutAction() {
-  await nextAuthSignOut();
+export async function login(
+  prevState: any,
+  formData: FormData
+): Promise<FormActionResult> {
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+
+  // Validate input using Zod
+  const validatedFields = loginSchema.safeParse({
+    email,
+    password,
+  });
+
+  if (!validatedFields.success) {
+    const errorMessages = validatedFields.error.issues.map(
+      (issue) => issue.message
+    );
+    return { success: false, error: errorMessages.join(", ") };
+  }
+
+  try {
+    await signIn("credentials", {
+      email,
+      password,
+      redirectTo: "/", // Redirect to home page on successful login
+    });
+    return { success: true }; // Should not be reached if redirect is successful
+  } catch (error) {
+    console.error("Login error:", error);
+    // Handle specific errors from signIn if needed
+    if ((error as Error).message.includes("CredentialsSignin")) {
+      return { success: false, error: "Invalid credentials." };
+    }
+    return { success: false, error: "Failed to login. Please try again." };
+  }
+}
+
+export async function signOutAction(): Promise<FormActionResult> {
+  try {
+    await nextAuthSignOut({ redirectTo: "/auth/login" });
+    return { success: true };
+  } catch (error) {
+    console.error("Sign out error:", error);
+    return { success: false, error: "Failed to sign out. Please try again." };
+  }
 }
 
