@@ -75,52 +75,7 @@ export async function register(
   }
 }
 
-export async function login(
-  prevState: any,
-  formData: FormData
-): Promise<FormActionResult> {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-
-  // Validate input using Zod (optional, but good practice)
-  const validatedFields = loginSchema.safeParse({
-    email,
-    password,
-  });
-
-  if (!validatedFields.success) {
-    const errorMessages = validatedFields.error.issues.map(
-      (issue) => issue.message
-    );
-    return { success: false, error: errorMessages.join(", ") };
-  }
-
-  try {
-    await signIn("credentials", {
-      email,
-      password,
-      redirectTo: "/",
-    });
-    return { success: true }; // Explicitly return success after redirect
-  } catch (error) {
-    // next-auth throws an error on redirect, so we catch it
-    // and only return an error if it's not the redirect error
-    if (error instanceof Error && error.message.includes("CredentialsSignin")) {
-      return { success: false, error: "Invalid credentials." };
-    }
-    // If it's not a CredentialsSignin error, it might be a redirect error
-    // or another unexpected error. For redirect errors, we don't return anything.
-    // For other errors, we log and return a generic message.
-    console.error("Login error:", error);
-    return { success: false, error: "Failed to login. Please try again." };
-  }
+export async function signOutAction() {
+  await nextAuthSignOut();
 }
-
-export async function signOut(): Promise<void> {
-  await nextAuthSignOut({ redirectTo: "/auth/login" });
-}
-
-
-
-
 

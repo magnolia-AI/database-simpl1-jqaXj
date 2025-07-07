@@ -22,7 +22,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className="h-full" suppressHydrationWarning>
       <body className="h-full flex flex-col antialiased">
-        <SessionProvider session={session}>
+        <SessionProvider>
           <ThemeProvider defaultTheme="light" attribute="class">
             <main className="flex-1">
               {children}
@@ -34,4 +34,5 @@ export default async function RootLayout({
     </html>
   )
 }
+
 
