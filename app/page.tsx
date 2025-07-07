@@ -1,28 +1,23 @@
-'use client'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { useToast } from "@/hooks/use-toast"
+import { auth, signOut } from "@/lib/auth"
+import { Button } from "@/components/ui/button"
+import { redirect } from "next/navigation"
 
-{/* 
-  TEMPLATE PAGE: Home
-  This is a template home page.
-  Replace all content with content that suits the users request.
-*/}
-export default function Home() {
-  const { toast } = useToast()
+export default async function Home() {
+  const session = await auth()
+
+  if (!session?.user) {
+    redirect("/auth/login")
+  }
+
   return (
-    <div className="min-h-full">
-
-      <section className="container mx-auto px-4 pt-24 pb-20">
-        <div className="max-w-[800px] mx-auto text-center">
-          <h1 className="text-5xl font-bold tracking-tight lg:text-6xl">
-            Template Starter
-          </h1>
-          <p className="mt-6 text-xl text-muted-foreground max-w-[600px] mx-auto">
-            This is a customizable template. Replace all content with your own using the chat interface.
-          </p>
-        </div>
-      </section>
+    <div className="flex flex-col items-center justify-center min-h-screen py-2">
+      <h1 className="text-4xl font-bold mb-4">Welcome, {session.user.name || session.user.email}!</h1>
+      <form action={async () => {
+        "use server"
+        await signOut()
+      }}>
+        <Button type="submit">Sign Out</Button>
+      </form>
     </div>
   )
 }
