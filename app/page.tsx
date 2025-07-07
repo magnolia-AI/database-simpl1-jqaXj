@@ -1,3 +1,4 @@
+"use client"
 import { auth } from "@/lib/auth"
 import { signOutAction } from "@/app/actions/auth"
 import { Button } from "@/components/ui/button"
