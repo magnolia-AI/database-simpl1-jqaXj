@@ -1,3 +1,5 @@
+'use client';
+
 import { register } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,7 +29,7 @@ export default function RegisterPage() {
             <Label htmlFor="password">Password</Label>
             <Input id="password" name="password" type="password" required />
           </div>
-          {state?.error && (
+          {state?.success === false && (
             <p className="text-center text-sm text-red-500">{state.error}</p>
           )}
           <Button type="submit" className="w-full">
@@ -44,4 +46,5 @@ export default function RegisterPage() {
     </div>
   );
 }
+
 

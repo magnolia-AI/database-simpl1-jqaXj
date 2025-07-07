@@ -20,7 +20,7 @@ const loginSchema = z.object({
 });
 
 // Type for form action results (simple error object or void for redirect)
-type FormActionResult = { error: string } | void;
+type FormActionResult = { success: true } | { success: false; error: string };
 
 export async function register(
   prevState: any,
@@ -41,7 +41,7 @@ export async function register(
     const errorMessages = validatedFields.error.issues.map(
       (issue) => issue.message
     );
-    return { error: errorMessages.join(", ") };
+    return { success: false, error: errorMessages.join(", ") };
   }
 
   try {
@@ -51,7 +51,7 @@ export async function register(
     });
 
     if (existingUser) {
-      return { error: "User with this email already exists." };
+      return { success: false, error: "User with this email already exists." };
     }
 
     // Hash password
@@ -68,9 +68,10 @@ export async function register(
 
     // Redirect to login page on success
     redirect("/auth/login");
+    return { success: true }; // Explicitly return success after redirect
   } catch (error) {
     console.error("Registration error:", error);
-    return { error: "Failed to register user. Please try again." };
+    return { success: false, error: "Failed to register user. Please try again." };
   }
 }
 
@@ -91,7 +92,7 @@ export async function login(
     const errorMessages = validatedFields.error.issues.map(
       (issue) => issue.message
     );
-    return { error: errorMessages.join(", ") };
+    return { success: false, error: errorMessages.join(", ") };
   }
 
   try {
@@ -100,21 +101,26 @@ export async function login(
       password,
       redirectTo: "/",
     });
+    return { success: true }; // Explicitly return success after redirect
   } catch (error) {
     // next-auth throws an error on redirect, so we catch it
     // and only return an error if it's not the redirect error
     if (error instanceof Error && error.message.includes("CredentialsSignin")) {
-      return { error: "Invalid credentials." };
+      return { success: false, error: "Invalid credentials." };
     }
     // If it's not a CredentialsSignin error, it might be a redirect error
     // or another unexpected error. For redirect errors, we don't return anything.
     // For other errors, we log and return a generic message.
     console.error("Login error:", error);
-    return { error: "Failed to login. Please try again." };
+    return { success: false, error: "Failed to login. Please try again." };
   }
 }
 
 export async function signOut(): Promise<void> {
   await nextAuthSignOut({ redirectTo: "/auth/login" });
 }
+
+
+
+
 
